@@ -126,6 +126,24 @@ The blast window is fixed at exactly 10 MiB. Geometry:
     completed reads);
   * window below the stack, `[0x49500000, 0x49f00000)` — **read completes**.
   Conclusion: the DMA-protected region includes the stack itself (protection extends at
+
+**Metadata descriptor probes (2026-11-14/15, QSEE pre-auth parse):** the secboot metadata
+descriptor (phdr1) fields are consumed by the secure-world parser with **64-bit address
+arithmetic and no length validation up to at least 16 MiB**:
+
+* p_filesz = 0x8000 / 0x100000 / 0x1000000 (16 MiB — beyond the 10 MiB image) — parser reads
+  the blob past the image buffer into adjacent DRAM, no crash, clean auth fail;
+* p_offset beyond the image (0xfff00000, 0xfc000000, 0x80000000) — hard hang every time
+  (base + offset lands unmapped; a 32-bit wrap would have landed in valid DRAM for two of
+  the three — it does not);
+* p_filesz = 0xffffffff — hard hang (§7c).
+
+So the descriptor path is **DoS only**: the parser walks the blob in place (64-bit), there
+is no length-driven copy into a fixed buffer on this path. Blind content fuzzing of the
+blob header was partially run (word-0 zeroing → hang, consistent with a header-driven walk);
+targeted length mutations require per-attempt hardware recovery and remain open.
+
+
   least down to ~0x4a280000, i.e. the whole `0x4a28xxxx–0x4a400000` area is covered), so a
   return-address overwrite via the pre-auth write is impossible — the ROP path suggested
   for the corrected geometry is closed empirically, not geometrically.
