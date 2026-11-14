@@ -143,6 +143,15 @@ is no length-driven copy into a fixed buffer on this path. Blind content fuzzing
 blob header was partially run (word-0 zeroing → hang, consistent with a header-driven walk);
 targeted length mutations require per-attempt hardware recovery and remain open.
 
+**No button-triggered recovery (2026-11-15, empirical):** powering the unit on with the
+reset button held shows the press registered by Linux gpio-keys at t=4.9 s
+(`gpio-keys: create event, name=reset, pressed=...`) and a completely normal boot —
+no boot-level recovery mode, no menu, no TFTP wait. The button is a Linux event only
+(reboot / factory reset via cfgmgr). There is no recovery OS partition; any hypothetical
+hidden recovery would still be signature-gated by the fused secure boot.
+
+
+
 
   least down to ~0x4a280000, i.e. the whole `0x4a28xxxx–0x4a400000` area is covered), so a
   return-address overwrite via the pre-auth write is impossible — the ROP path suggested
