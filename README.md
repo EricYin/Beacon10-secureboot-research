@@ -144,11 +144,12 @@ blob header was partially run (word-0 zeroing → hang, consistent with a header
 targeted length mutations require per-attempt hardware recovery and remain open.
 
 **No button-triggered recovery (2026-11-15, empirical):** powering the unit on with the
-reset button held shows the press registered by Linux gpio-keys at t=4.9 s
-(`gpio-keys: create event, name=reset, pressed=...`) and a completely normal boot —
-no boot-level recovery mode, no menu, no TFTP wait. The button is a Linux event only
-(reboot / factory reset via cfgmgr). There is no recovery OS partition; any hypothetical
-hidden recovery would still be signature-gated by the fused secure boot.
+reset button held, with the WPS button held, and with **both buttons held** — all three
+combinations show the presses registered by Linux gpio-keys (`name=reset`, `name=wps`,
+`pressed=1`) and a completely normal boot — no boot-level recovery mode, no menu, no
+TFTP wait. The buttons are Linux events only (reboot / factory reset / WPS via cfgmgr).
+There is no recovery OS partition; any hypothetical hidden recovery would still be
+signature-gated by the fused secure boot.
 
 
 
